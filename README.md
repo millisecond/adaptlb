@@ -1,12 +1,9 @@
 
 ##### Current version: UNRELEASED / FIRST VERSION IN DEV
 
-[![License MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/millisecond/linespeedlb/master/LICENSE)
-
 OLB is a fast, modern, load balancer (HTTP(S) / TCP / UDP) for deploying applications on AWS.
 
 OLB is developed and maintained by [Casey Haakenson](https://twitter.com/millisecond).
-
 
 ## Getting started
 
