@@ -3,12 +3,12 @@ package model
 import "net/http"
 
 // Container for all state associated with an inbound request
-type Request struct {
+type LBRequest struct {
 	Type string // "http", "tcp", or"udp"
 
 	Listener *Listener
-	Backend  *ServerPool
 
+	SharedState *SharedState
 	LiveServer *LiveServer
 
 	// If http-type

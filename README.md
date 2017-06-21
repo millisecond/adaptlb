@@ -5,7 +5,7 @@ AdaptLB is a fast, modern, load balancer (HTTP(S) / TCP / UDP) for deploying app
 
 * Automatically updates Route53 to point A records to LB public IPs
 
-* Valid load balancing targets include IP List, ASGs, Target Groups, and Tagged Instances.
+* Valid load balancing targets include List of IPs, Target Groups, and Tagged Instances.
 
 AdaptLB is developed and maintained by [Casey Haakenson](https://twitter.com/millisecond).
 

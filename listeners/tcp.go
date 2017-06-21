@@ -7,6 +7,7 @@ import (
 	"net"
 	"strconv"
 	"sync"
+	"github.com/millisecond/adaptlb/model"
 )
 
 var tcpListenerMutex = &sync.Mutex{}
@@ -14,7 +15,7 @@ var tcpListeners = map[int]net.Listener{}
 var tcpListenerConnections = map[int][]net.Conn{}
 var tcpListenerMutexes = map[int]*sync.Mutex{}
 
-func AddTCPPort(port int) error {
+func AddTCPPort(listener *model.Listener, port int) error {
 	tcpListenerMutex.Lock()
 	defer tcpListenerMutex.Unlock()
 	listen := ":" + strconv.Itoa(port)
@@ -22,13 +23,13 @@ func AddTCPPort(port int) error {
 		return errors.New("Already listening on TCP " + listen)
 	}
 	log.Println("Opening LB TCP port", listen)
-	l, err := net.Listen("tcp", listen)
+	tcpListener, err := net.Listen("tcp", listen)
 	if err != nil {
 		return err
 	}
-	tcpListeners[port] = l
+	tcpListeners[port] = tcpListener
 	tcpListenerMutexes[port] = &sync.Mutex{}
-	tcpListen(l)
+	go tcpListen(listener, tcpListener)
 	return nil
 }
 
@@ -54,19 +55,19 @@ func RemoveTCPPort(port int) error {
 	}
 }
 
-func tcpListen(l net.Listener) error {
-	defer l.Close()
+func tcpListen(listener *model.Listener, tcpListener net.Listener) error {
+	defer tcpListener.Close()
 	for {
-		c, err := l.Accept()
+		c, err := tcpListener.Accept()
 		if err != nil {
 			return err
 		}
-		go handleTCPRequest(c)
+		go handleTCPRequest(listener, c)
 	}
 }
 
 // Handles incoming requests.
-func handleTCPRequest(c net.Conn) {
+func handleTCPRequest(listener *model.Listener, c net.Conn) {
 	port, err := portFromConn(c)
 	if err != nil {
 		log.Println("ERROR Capturing new HTTP connection:", err)
@@ -85,6 +86,13 @@ func handleTCPRequest(c net.Conn) {
 		delete(tcpListenerConnections, port)
 	}()
 
+	adapt := &model.LBRequest{
+		Type: "tcp",
+		Listener: listener,
+	}
+
+	log.Println(adapt)
+
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)
 	// Read the incoming connection into the buffer.
@@ -92,8 +100,9 @@ func handleTCPRequest(c net.Conn) {
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
+
 	// Send a response back to person contacting us.
-	c.Write([]byte("Message received."))
+	c.Write([]byte("OK"))
 	// Close the connection when you're done with it.
 	c.Close()
 }

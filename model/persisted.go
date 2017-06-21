@@ -7,6 +7,8 @@ import (
 type Listener struct {
 	Type string `json:"type,omitempty"` // "http", "tcp", or"udp": HTTP load balancers can share ports, TCP/UDP are exclusive
 
+	Pools	[]*ServerPool `pools:"type,omitempty"`
+
 	// HTTP-only
 	FQDN string `json:"fqdn,omitempty"` // All HTTP domains use hostname routing, TCP and UDP use for updating A records
 	//TLSHeader        string `json:"tlsHeader,omitempty"`
@@ -21,11 +23,15 @@ type Listener struct {
 }
 
 type ServerPool struct {
-	Backends map[string]Backend `json:"servers,omitempty"`
+
+	Backends []Backend `json:"backends,omitempty"` // Can be multiple to facilitate IP Lists and blue/green deploys
 	//CircuitBreaker *CircuitBreaker    `json:"circuitBreaker,omitempty"`
 
 	Strategy      string `json:"strategy,omitempty"`      // "random", "roundrobin" - picks servers, sticky will override
-	StickySession string `json:"sticykSession,omitempty"` // "cookie", "src_ip", "src_port", "dst_ip", "dst_port"
+	StickySession string `json:"stickySession,omitempty"` // "cookie", "src_ip", "src_port", "dst_ip", "dst_port"
+
+	// HTTP-only
+	Path 	string `json:"route,omitempty"`  // "" == default, "/admin", "/checkout"
 
 	// Net connection settings
 	MaxIdle               int           `json:"maxIdle,omitempty"`
