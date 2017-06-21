@@ -2,11 +2,11 @@ package listeners
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"strconv"
 	"sync"
-	"fmt"
 )
 
 var tcpListenerMutex = &sync.Mutex{}

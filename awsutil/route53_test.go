@@ -2,10 +2,10 @@ package awsutil
 
 import (
 	"context"
-	"log"
 	"github.com/facebookgo/ensure"
 	"github.com/millisecond/adaptlb/config"
 	"github.com/millisecond/adaptlb/testutil"
+	"log"
 	"testing"
 )
 

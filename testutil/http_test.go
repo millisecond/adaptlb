@@ -1,9 +1,9 @@
 package testutil
 
 import (
-	"testing"
-	"net/http"
 	"github.com/facebookgo/ensure"
+	"net/http"
+	"testing"
 )
 
 func TestStoppableHTTPListener(t *testing.T) {

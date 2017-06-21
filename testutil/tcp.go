@@ -1,16 +1,16 @@
 package testutil
 
 import (
+	"fmt"
+	"github.com/facebookgo/ensure"
+	"log"
 	"net"
 	"strconv"
 	"testing"
-	"github.com/facebookgo/ensure"
-	"fmt"
-	"log"
 )
 
 func TestTCPServer(t *testing.T, port int) net.Listener {
-	l, err := net.Listen("tcp", ":" + strconv.Itoa(port))
+	l, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	ensure.Nil(t, err)
 	go func() {
 		for {

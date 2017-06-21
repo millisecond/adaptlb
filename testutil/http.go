@@ -1,12 +1,12 @@
 package testutil
 
 import (
+	"fmt"
 	"github.com/facebookgo/ensure"
 	"io/ioutil"
 	"net/http"
-	"testing"
 	"strconv"
-	"fmt"
+	"testing"
 )
 
 func TestHTTPServer(port int) *http.Server {
@@ -14,7 +14,7 @@ func TestHTTPServer(port int) *http.Server {
 		fmt.Fprint(w, "OK")
 	}
 	srv := &http.Server{
-		Addr: "localhost:"+strconv.Itoa(port),
+		Addr:    "localhost:" + strconv.Itoa(port),
 		Handler: http.HandlerFunc(handler),
 	}
 	go func() {

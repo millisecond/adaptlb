@@ -6,7 +6,7 @@ import (
 )
 
 func TestStoppableTCPListener(t *testing.T) {
-	l := TestTCPServer(t,8002)
+	l := TestTCPServer(t, 8002)
 	send := []byte("YO")
 	expect := []byte("OK")
 	servAddr := "localhost:8002"

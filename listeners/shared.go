@@ -1,8 +1,8 @@
 package listeners
 
 import (
-	"strconv"
 	"net"
+	"strconv"
 )
 
 func portFromConn(c net.Conn) (int, error) {
