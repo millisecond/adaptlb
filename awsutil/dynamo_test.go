@@ -1,11 +1,11 @@
 package awsutil
 
 import (
+	"context"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/facebookgo/ensure"
 	"testing"
-	"context"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/aws"
 )
 
 func TestDyanmoVersioning(t *testing.T) {
@@ -18,7 +18,7 @@ func TestDyanmoVersioning(t *testing.T) {
 	ensure.DeepEqual(t, version, -1)
 
 	values := map[string]*dynamodb.AttributeValue{
-		"records":  {SS: aws.StringSlice([]string{"1.1.1.1", "1.1.1.2"})},
+		"records": {SS: aws.StringSlice([]string{"1.1.1.1", "1.1.1.2"})},
 	}
 
 	updated, err := UpdateVersionedItem(context.Background(), cfg, DNSUpdateType, DNSUpdateRangeKey, version, values)
@@ -32,7 +32,7 @@ func TestDyanmoVersioning(t *testing.T) {
 
 	ips := []string{"1.1.1.1", "1.1.1.2", "1.1.1.3"}
 	values = map[string]*dynamodb.AttributeValue{
-		"records":  {SS: aws.StringSlice(ips)},
+		"records": {SS: aws.StringSlice(ips)},
 	}
 
 	updated, err = UpdateVersionedItem(context.Background(), cfg, DNSUpdateType, DNSUpdateRangeKey, version+1, values)
@@ -44,4 +44,3 @@ func TestDyanmoVersioning(t *testing.T) {
 
 	ensure.DeepEqual(t, aws.StringValueSlice(get.Item["records"].SS), ips)
 }
-

@@ -5,26 +5,26 @@ import (
 )
 
 type Listener struct {
-	Type      string `json:"type,omitempty"`      // "http", "tcp", or"udp": HTTP load balancers can share ports, TCP/UDP are exclusive
+	Type string `json:"type,omitempty"` // "http", "tcp", or"udp": HTTP load balancers can share ports, TCP/UDP are exclusive
 
 	// HTTP-only
-	FQDN      string `json:"fqdn,omitempty"`      // All HTTP domains use hostname routing, TCP and UDP use for updating A records
+	FQDN string `json:"fqdn,omitempty"` // All HTTP domains use hostname routing, TCP and UDP use for updating A records
 	//TLSHeader        string `json:"tlsHeader,omitempty"`
 	//TLSHeaderValue   string `json:"tlsHeaderValue,omitempty"`
 	//GZIPContentTypes string `json:"gzipContentTypes,omitempty"`
-	NoRouteStatus  int `json:"noRouteStatus,omitempty"`
+	NoRouteStatus int `json:"noRouteStatus,omitempty"`
 
 	//All
-	Ports     string `json:"ports,omitempty"`     // "80" or "80,443" or "80-8000"
-	DNSRecords DNSRecords `json:"dnsRecords,omitempty"` // Type of upstream DNS provider to update ("route53") or "" to disable updates
-	ShutdownWaitMS int `json:"shutdownWaitMS,omitempty"`
+	Ports          string     `json:"ports,omitempty"`      // "80" or "80,443" or "80-8000"
+	DNSRecords     DNSRecords `json:"dnsRecords,omitempty"` // Type of upstream DNS provider to update ("route53") or "" to disable updates
+	ShutdownWaitMS int        `json:"shutdownWaitMS,omitempty"`
 }
 
 type ServerPool struct {
-	Backends       map[string]Backend `json:"servers,omitempty"`
+	Backends map[string]Backend `json:"servers,omitempty"`
 	//CircuitBreaker *CircuitBreaker    `json:"circuitBreaker,omitempty"`
 
-	Strategy      string `json:"strategy,omitempty"`     // "random", "roundrobin" - picks servers, sticky will override
+	Strategy      string `json:"strategy,omitempty"`      // "random", "roundrobin" - picks servers, sticky will override
 	StickySession string `json:"sticykSession,omitempty"` // "cookie", "src_ip", "src_port", "dst_ip", "dst_port"
 
 	// Net connection settings
@@ -70,9 +70,9 @@ type HealthCheck struct {
 }
 
 type DNSRecords struct {
-	Enabled bool
-	ZoneName	string
-	RecordSetID	string
-	Type		string
-	Records		[]string
+	Enabled     bool
+	ZoneName    string
+	RecordSetID string
+	Type        string
+	Records     []string
 }

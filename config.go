@@ -1,4 +1,4 @@
-package linespeedlb
+package adaptlb
 
 import (
 	"github.com/aws/aws-sdk-go/aws"

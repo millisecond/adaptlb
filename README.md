@@ -1,24 +1,25 @@
 
 ##### Current version: UNRELEASED / FIRST VERSION IN DEV
 
-OLB is a fast, modern, load balancer (HTTP(S) / TCP / UDP) for deploying applications on AWS.
+AdaptLB is a fast, modern, load balancer (HTTP(S) / TCP / UDP) for deploying applications on AWS.
 
-OLB is developed and maintained by [Casey Haakenson](https://twitter.com/millisecond).
+* Automatically updates Route53 to point A records to LB public IPs
+
+* Valid load balancing targets include IP List, ASGs, Target Groups, and Tagged Instances.
+
+AdaptLB is developed and maintained by [Casey Haakenson](https://twitter.com/millisecond).
 
 ## Getting started
 
-1. Install from source, [binary](https://github.com/millisecond/linespeedlb/releases),
-   [Docker](https://hub.docker.com/r/millisecond/linespeedlb/) or [Homebrew](http://brew.sh).
+1. Install from source, [binary](https://github.com/millisecond/adaptlb/releases) or
+   [Docker](https://hub.docker.com/r/millisecond/adaptlb/).
     ```
 	# go 1.8 or higher is required
-    go get github.com/millisecond/linespeedlb                     (>= go1.8)
+    go get github.com/millisecond/adaptlb                     (>= go1.8)
 
-    brew install linespeedlb                                  (OSX/macOS stable)
-    brew install --devel linespeedlb                          (OSX/macOS devel)
+    docker pull millisecond/adaptlb                           (Docker)
 
-    docker pull millisecond/linespeedlb                           (Docker)
-
-    https://github.com/millisecond/linespeedlb/releases           (pre-built binaries)
+    https://github.com/millisecond/adaptlb/releases           (pre-built binaries)
     ```
 
 2. Create a Target Group
@@ -47,4 +48,4 @@ OLB is developed and maintained by [Casey Haakenson](https://twitter.com/millise
 
 ## License
 
-See [LICENSE](https://github.com/millisecond/linespeedlb/blob/master/LICENSE) for details.
+See [LICENSE](https://github.com/millisecond/adaptlb/blob/master/LICENSE) for details.

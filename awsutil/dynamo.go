@@ -1,13 +1,12 @@
 package awsutil
 
-import ()
 import (
 	"context"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/millisecond/linespeedlb/config"
-	"strconv"
 	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/millisecond/adaptlb/config"
+	"strconv"
 )
 
 const DEFAULT_TABLE_NAME = "LineSpeedLB"
@@ -23,8 +22,8 @@ const DEFAULT_READ_THROUGHPUT = 5
 type ObjectType string
 
 const (
-	DNSUpdateType ObjectType = "DNSUPDATE"
-	DNSUpdateRangeKey             = "dns"
+	DNSUpdateType     ObjectType = "DNSUPDATE"
+	DNSUpdateRangeKey            = "dns"
 )
 
 func DynamoDBClient(ctx context.Context, cfg *config.Config) *dynamodb.DynamoDB {
@@ -74,7 +73,7 @@ func CreateTable(ctx context.Context, cfg *config.Config) (*dynamodb.CreateTable
 
 func DeleteItem(ctx context.Context, cfg *config.Config, objectType ObjectType, id string) error {
 	_, err := DynamoDBClient(ctx, cfg).DeleteItem(&dynamodb.DeleteItemInput{
-		TableName:      aws.String(cfg.AWSConfig.DynamoTableName),
+		TableName: aws.String(cfg.AWSConfig.DynamoTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			HASH_KEY:  {S: aws.String(string(objectType))},
 			RANGE_KEY: {S: aws.String(id)},
@@ -85,7 +84,7 @@ func DeleteItem(ctx context.Context, cfg *config.Config, objectType ObjectType, 
 
 func GetItem(ctx context.Context, cfg *config.Config, objectType ObjectType, id string) (*dynamodb.GetItemOutput, error) {
 	return DynamoDBClient(ctx, cfg).GetItem(&dynamodb.GetItemInput{
-		TableName:      aws.String(cfg.AWSConfig.DynamoTableName),
+		TableName: aws.String(cfg.AWSConfig.DynamoTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			HASH_KEY:  {S: aws.String(string(objectType))},
 			RANGE_KEY: {S: aws.String(id)},
@@ -119,8 +118,8 @@ func GetVersionedItem(ctx context.Context, cfg *config.Config, objectType Object
 func UpdateVersionedItem(ctx context.Context, cfg *config.Config, objectType ObjectType, id string, oldVersion int, set map[string]*dynamodb.AttributeValue) (bool, error) {
 	oldVersionStr := strconv.Itoa(oldVersion)
 	expressionValues := map[string]*dynamodb.AttributeValue{}
-	setStr := "SET " +VERSION_KEY +" = :" + VERSION_KEY +", "
-	expressionValues[":" + VERSION_KEY] = &dynamodb.AttributeValue{N: aws.String(strconv.Itoa(oldVersion + 1))}
+	setStr := "SET " + VERSION_KEY + " = :" + VERSION_KEY + ", "
+	expressionValues[":"+VERSION_KEY] = &dynamodb.AttributeValue{N: aws.String(strconv.Itoa(oldVersion + 1))}
 	for k, v := range set {
 		setStr += k + " = :" + k
 		expressionValues[":"+k] = v
@@ -128,9 +127,9 @@ func UpdateVersionedItem(ctx context.Context, cfg *config.Config, objectType Obj
 	conditionalExpression := VERSION_KEY + " = :old" + VERSION_KEY
 	if oldVersion < 0 {
 		// no previous id, make sure we're the first one
-		conditionalExpression = "attribute_not_exists("+VERSION_KEY+")"
+		conditionalExpression = "attribute_not_exists(" + VERSION_KEY + ")"
 	} else {
-		expressionValues[":old" + VERSION_KEY] = &dynamodb.AttributeValue{N: aws.String(oldVersionStr)}
+		expressionValues[":old"+VERSION_KEY] = &dynamodb.AttributeValue{N: aws.String(oldVersionStr)}
 	}
 	output, err := DynamoDBClient(ctx, cfg).UpdateItem(&dynamodb.UpdateItemInput{
 		TableName: aws.String(cfg.AWSConfig.DynamoTableName),

@@ -1,15 +1,15 @@
 package awsutil
 
 import (
-	"github.com/millisecond/linespeedlb/config"
+	"github.com/millisecond/adaptlb/config"
 
 	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/containous/traefik/log"
 	"github.com/facebookgo/ensure"
 	"testing"
-	"github.com/containous/traefik/log"
 )
 
 func CreateSession(cfg *config.Config) *session.Session {

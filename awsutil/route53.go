@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/route53"
-	"github.com/millisecond/linespeedlb/config"
+	"github.com/millisecond/adaptlb/config"
 )
 
 const DEFAULT_TTL = 60

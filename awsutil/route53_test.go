@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/containous/traefik/log"
 	"github.com/facebookgo/ensure"
-	"github.com/millisecond/linespeedlb/config"
-	"github.com/millisecond/linespeedlb/testutil"
+	"github.com/millisecond/adaptlb/config"
+	"github.com/millisecond/adaptlb/testutil"
 	"testing"
 )
 
