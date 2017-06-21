@@ -2,7 +2,7 @@ package awsutil
 
 import (
 	"context"
-	"github.com/containous/traefik/log"
+	"log"
 	"github.com/facebookgo/ensure"
 	"github.com/millisecond/adaptlb/config"
 	"github.com/millisecond/adaptlb/testutil"

@@ -7,9 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/containous/traefik/log"
 	"github.com/facebookgo/ensure"
 	"testing"
+	"log"
 )
 
 func CreateSession(cfg *config.Config) *session.Session {

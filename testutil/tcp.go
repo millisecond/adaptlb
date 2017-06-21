@@ -6,7 +6,7 @@ import (
 	"testing"
 	"github.com/facebookgo/ensure"
 	"fmt"
-	"github.com/containous/traefik/log"
+	"log"
 )
 
 func TestTCPServer(t *testing.T, port int) net.Listener {
