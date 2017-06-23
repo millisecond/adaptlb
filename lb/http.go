@@ -1,8 +1,9 @@
-package listeners
+package lb
 
 import (
 	"errors"
 	"fmt"
+	"github.com/millisecond/adaptlb/model"
 	"log"
 	"net"
 	"net/http"
@@ -21,7 +22,7 @@ var HTTPServer = &http.Server{
 	ConnState: connState,
 }
 
-// Requests first come into the HostnameMultiplexer which will assign it to a specific Listener (or Bad Gateway)
+// Requests first come into the HostnameMultiplexer which will assign it to a specific Frontend (or Bad Gateway)
 func hostnameMultiplexer(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 }
@@ -43,21 +44,27 @@ func connState(c net.Conn, state http.ConnState) {
 	}
 }
 
-func AddHTTPPort(port int) error {
+func AddHTTPPort(frontend *model.Frontend) error {
 	httpListenerMutex.Lock()
 	defer httpListenerMutex.Unlock()
-	listen := ":" + strconv.Itoa(port)
-	if _, pres := httpListeners[port]; pres {
-		return errors.New("Already listening on HTTP " + listen)
-	}
-	log.Println("Opening LB HTTP port", listen)
-	l, err := net.Listen("tcp", listen)
+	ports, err := parsePorts(frontend.Ports)
 	if err != nil {
 		return err
 	}
-	httpListeners[port] = l
-	httpListenerMutexes[port] = &sync.Mutex{}
-	go HTTPServer.Serve(l)
+	for _, port := range ports {
+		listen := ":" + strconv.Itoa(port)
+		if _, pres := httpListeners[port]; pres {
+			return errors.New("Already listening on HTTP " + listen)
+		}
+		log.Println("Opening LB HTTP port", listen)
+		l, err := net.Listen("tcp", listen)
+		if err != nil {
+			return err
+		}
+		httpListeners[port] = l
+		httpListenerMutexes[port] = &sync.Mutex{}
+		go HTTPServer.Serve(l)
+	}
 	return nil
 }
 

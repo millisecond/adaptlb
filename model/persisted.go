@@ -2,12 +2,15 @@ package model
 
 import (
 	"time"
+	"github.com/millisecond/adaptlb/lb"
 )
 
-type Listener struct {
+type Frontend struct {
+	RowID string `json:"rowId,omitempty"`
+
 	Type string `json:"type,omitempty"` // "http", "tcp", or"udp": HTTP load balancers can share ports, TCP/UDP are exclusive
 
-	Pools	[]*ServerPool `pools:"type,omitempty"`
+	ServerPools []*ServerPool `serverPools:"type,omitempty"`
 
 	// HTTP-only
 	FQDN string `json:"fqdn,omitempty"` // All HTTP domains use hostname routing, TCP and UDP use for updating A records
@@ -18,11 +21,13 @@ type Listener struct {
 
 	//All
 	Ports          string     `json:"ports,omitempty"`      // "80" or "80,443" or "80-8000"
+	SecurePorts          string     `json:"ports,omitempty"`      // "443" or "443,8443" or "443-8443"
 	DNSRecords     DNSRecords `json:"dnsRecords,omitempty"` // Type of upstream DNS provider to update ("route53") or "" to disable updates
 	ShutdownWaitMS int        `json:"shutdownWaitMS,omitempty"`
 }
 
 type ServerPool struct {
+	RowID string `json:"rowId,omitempty"`
 
 	Backends []Backend `json:"backends,omitempty"` // Can be multiple to facilitate IP Lists and blue/green deploys
 	//CircuitBreaker *CircuitBreaker    `json:"circuitBreaker,omitempty"`
@@ -31,7 +36,7 @@ type ServerPool struct {
 	StickySession string `json:"stickySession,omitempty"` // "cookie", "src_ip", "src_port", "dst_ip", "dst_port"
 
 	// HTTP-only
-	Path 	string `json:"route,omitempty"`  // "" == default, "/admin", "/checkout"
+	Path string `json:"route,omitempty"` // "" == default, "/admin", "/checkout"
 
 	// Net connection settings
 	MaxIdle               int           `json:"maxIdle,omitempty"`
@@ -43,8 +48,8 @@ type ServerPool struct {
 	FlushInterval         time.Duration `json:"flushInterval,omitempty"`
 
 	// In-memory state, don't persist
-	LiveServers []*LiveServer `json:"-"`
-	SharedState *SharedState  `json:"-"`
+	LiveServers []*lb.LiveServer `json:"-"`
+	SharedState *lb.SharedState  `json:"-"`
 }
 
 // DoS prevention: if one of these conditions is triggered for a node, it's no longer available as a target.
@@ -55,6 +60,8 @@ type ServerPool struct {
 //}
 
 type Backend struct {
+	RowID string `json:"rowId,omitempty"`
+
 	Type   string `json:"type,omitempty"` // "individual", "asg", "targetgroup", "tagged"
 	ID     string `json:"id,omitempty"`   // ip/hostname, ASG-name, targetgroup name, tag
 	Port   int    `json:"port"`           // port to use when connecting, invalid for "targetgroup"
@@ -62,6 +69,8 @@ type Backend struct {
 }
 
 type HealthCheck struct {
+	RowID string `json:"rowId,omitempty"`
+
 	Type string // "http", "tcp", "icmp"
 
 	// "http"-specific fields
@@ -76,6 +85,8 @@ type HealthCheck struct {
 }
 
 type DNSRecords struct {
+	RowID string `json:"rowId,omitempty"`
+
 	Enabled     bool
 	ZoneName    string
 	RecordSetID string

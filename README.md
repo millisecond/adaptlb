@@ -1,7 +1,12 @@
 
 ##### Current version: UNRELEASED / FIRST VERSION IN DEV
 
-AdaptLB is a fast, modern, load balancer (HTTP(S) / TCP / UDP) for deploying applications on AWS.
+
+AWS-native auto-scaling load balancer with Route53 zone updates.
+
+Fast, modern, and easy to deploy load balancer (HTTP(S) / TCP / UDP) for deploying applications on AWS.
+
+* Gossip cluster allows dynamic scaling, shared state, and fast failover of load-balancer or target nodes.
 
 * Automatically updates Route53 to point A records to LB public IPs
 
@@ -10,6 +15,8 @@ AdaptLB is a fast, modern, load balancer (HTTP(S) / TCP / UDP) for deploying app
 AdaptLB is developed and maintained by [Casey Haakenson](https://twitter.com/millisecond).
 
 ## Getting started
+
+To install it locally, [go here]()
 
 1. Install from source, [binary](https://github.com/millisecond/adaptlb/releases) or
    [Docker](https://hub.docker.com/r/millisecond/adaptlb/).

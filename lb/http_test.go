@@ -1,7 +1,8 @@
-package listeners
+package lb
 
 import (
 	"github.com/facebookgo/ensure"
+	"github.com/millisecond/adaptlb/model"
 	"github.com/millisecond/adaptlb/testutil"
 	"net/http"
 	"strconv"
@@ -9,8 +10,10 @@ import (
 )
 
 func TestHTTPListener(t *testing.T) {
+	frontend := &model.Frontend{Ports: "8000"}
+
 	port := 8000
-	err := AddHTTPPort(port)
+	err := AddHTTPPort(frontend)
 	ensure.Nil(t, err)
 
 	url := "http://localhost:" + strconv.Itoa(port)
