@@ -105,12 +105,12 @@ func handleTCPRequest(listener *TCPListener, c net.Conn) {
 		delete(listener.connections, port)
 	}()
 
-	lbReq := &model.LBRequest{
-		Type:     "tcp",
-		Frontend: listener.frontend,
-	}
+	//lbReq := &LBRequest{
+	//	Type:     "tcp",
+	//	Frontend: listener.frontend,
+	//}
 
-	model.LoadBalance(lbReq)
+	//model.LoadBalance(lbReq)
 
 	// Make a buffer to hold incoming data.
 	buf := make([]byte, 1024)

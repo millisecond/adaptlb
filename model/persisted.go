@@ -2,7 +2,6 @@ package model
 
 import (
 	"time"
-	"github.com/millisecond/adaptlb/lb"
 )
 
 type Frontend struct {
@@ -21,7 +20,7 @@ type Frontend struct {
 
 	//All
 	Ports          string     `json:"ports,omitempty"`      // "80" or "80,443" or "80-8000"
-	SecurePorts          string     `json:"ports,omitempty"`      // "443" or "443,8443" or "443-8443"
+	SecurePorts    string     `json:"ports,omitempty"`      // "443" or "443,8443" or "443-8443"
 	DNSRecords     DNSRecords `json:"dnsRecords,omitempty"` // Type of upstream DNS provider to update ("route53") or "" to disable updates
 	ShutdownWaitMS int        `json:"shutdownWaitMS,omitempty"`
 }
@@ -47,9 +46,9 @@ type ServerPool struct {
 	KeepAliveTimeout      time.Duration `json:"keepAliveTimeout,omitempty"`
 	FlushInterval         time.Duration `json:"flushInterval,omitempty"`
 
-	// In-memory state, don't persist
-	LiveServers []*lb.LiveServer `json:"-"`
-	SharedState *lb.SharedState  `json:"-"`
+	//// In-memory state, don't persist
+	//LiveServers []*lb.LiveServer `json:"-"`
+	//SharedState *lb.SharedState  `json:"-"`
 }
 
 // DoS prevention: if one of these conditions is triggered for a node, it's no longer available as a target.

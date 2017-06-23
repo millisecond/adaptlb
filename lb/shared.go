@@ -37,7 +37,7 @@ func Activate(cfg *config.Config) error {
 		found := false
 		for _, toAdd := range cfg.Frontends {
 			if toAdd.RowID == existing.RowID {
-				toAdd.Listeners = existing.Listeners
+				//toAdd.Listeners = existing.Listeners
 				found = true
 			}
 		}
@@ -52,7 +52,7 @@ func Activate(cfg *config.Config) error {
 		for _, existing := range activeConfig.Frontends {
 			if toAdd.RowID == existing.RowID {
 				// TODO changed ports
-				toAdd.Listeners = existing.Listeners
+				//toAdd.Listeners = existing.Listeners
 				found = true
 			}
 		}
@@ -62,11 +62,11 @@ func Activate(cfg *config.Config) error {
 	}
 
 	// Stop old ones
-	for _, fe := range removedFrontEnds {
-		for _, listener := range *fe.Listeners {
-			(*listener).Stop()
-		}
-	}
+	//for _, fe := range removedFrontEnds {
+		//for _, listener := range *fe.Listeners {
+		//	(*listener).Stop()
+		//}
+	//}
 
 	// Start listening on new ones
 	for _, fe := range addedFrontends {

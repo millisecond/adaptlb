@@ -1,8 +1,8 @@
 package lb
 
 import (
-	"net/http"
 	"github.com/millisecond/adaptlb/model"
+	"net/http"
 )
 
 // Container for all state associated with an inbound request
