@@ -63,15 +63,15 @@ func Activate(cfg *config.Config) error {
 
 	// Stop old ones
 	//for _, fe := range removedFrontEnds {
-		//for _, listener := range *fe.Listeners {
-		//	(*listener).Stop()
-		//}
+	//	for _, listener := range *fe.Listeners {
+	//		(*listener).Stop()
+	//	}
 	//}
 
 	// Start listening on new ones
-	for _, fe := range addedFrontends {
-		addListener(fe)
-	}
+	//for _, fe := range addedFrontends {
+	//	addListener(fe)
+	//}
 
 	activeConfig.Frontends = cfg.Frontends
 

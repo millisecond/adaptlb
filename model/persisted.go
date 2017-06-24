@@ -23,6 +23,8 @@ type Frontend struct {
 	SecurePorts    string     `json:"ports,omitempty"`      // "443" or "443,8443" or "443-8443"
 	DNSRecords     DNSRecords `json:"dnsRecords,omitempty"` // Type of upstream DNS provider to update ("route53") or "" to disable updates
 	ShutdownWaitMS int        `json:"shutdownWaitMS,omitempty"`
+
+	Listeners *[]*Listener `json:"-"`
 }
 
 type ServerPool struct {
@@ -46,9 +48,9 @@ type ServerPool struct {
 	KeepAliveTimeout      time.Duration `json:"keepAliveTimeout,omitempty"`
 	FlushInterval         time.Duration `json:"flushInterval,omitempty"`
 
-	//// In-memory state, don't persist
-	//LiveServers []*lb.LiveServer `json:"-"`
-	//SharedState *lb.SharedState  `json:"-"`
+	// In-memory state, don't persist
+	LiveServers []*LiveServer `json:"-"`
+	SharedState *SharedState  `json:"-"`
 }
 
 // DoS prevention: if one of these conditions is triggered for a node, it's no longer available as a target.

@@ -1,15 +1,16 @@
-package lb
+package model
 
 import (
-	"github.com/millisecond/adaptlb/model"
 	"net/http"
+	"sync"
+	"net"
 )
 
 // Container for all state associated with an inbound request
 type LBRequest struct {
 	Type string // "http", "tcp", or"udp"
 
-	Frontend    *model.Frontend
+	Frontend    *Frontend
 	SharedState *SharedState
 
 	// The target of the load balancing
@@ -21,9 +22,9 @@ type LBRequest struct {
 }
 
 type Listener interface {
-	Create(*model.Frontend)
+	Create(*Frontend)
 	Stop()
-	StopIfNot(*model.Frontend)
+	StopIfNot(*Frontend)
 }
 
 // In-memory structure to store state per-backend
@@ -33,17 +34,25 @@ type SharedState struct {
 
 // In-memory structure that combines Backend and the results of Healthcheck
 type LiveFrontend struct {
-	FrontEnd *model.Frontend
+	FrontEnd *Frontend
 
 	Listeners *[]*Listener
 }
 
 // In-memory structure that combines Backend and the results of Healthcheck
 type LiveServer struct {
-	Server *model.Backend
+	Server *Backend
 
 	// Healthcheck state
 	Healthy             bool
 	SuccessiveFailures  int
 	SuccessiveSuccesses int
+}
+
+type TCPListener struct {
+	Port        int
+	Mutex       *sync.Mutex
+	Socket      net.Listener
+	Frontend    *Frontend
+	Connections map[int][]net.Conn
 }

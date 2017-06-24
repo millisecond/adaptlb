@@ -11,15 +11,8 @@ import (
 )
 
 var tcpListenerMutex = &sync.Mutex{}
-var tcpListeners = map[int]*TCPListener{}
+var tcpListeners = map[int]*model.TCPListener{}
 
-type TCPListener struct {
-	port        int
-	mutex       *sync.Mutex
-	socket      net.Listener
-	frontend    *model.Frontend
-	connections map[int][]net.Conn
-}
 
 func AddTCPPort(frontend *model.Frontend) error {
 	tcpListenerMutex.Lock()
@@ -39,12 +32,12 @@ func AddTCPPort(frontend *model.Frontend) error {
 		if err != nil {
 			return err
 		}
-		tcpListener := &TCPListener{
-			port:        port,
-			mutex:       &sync.Mutex{},
-			socket:      socket,
-			frontend:    frontend,
-			connections: map[int][]net.Conn{},
+		tcpListener := &model.TCPListener{
+			Port:        port,
+			Mutex:       &sync.Mutex{},
+			Socket:      socket,
+			Frontend:    frontend,
+			Connections: map[int][]net.Conn{},
 		}
 		tcpListeners[port] = tcpListener
 		go tcpListen(tcpListener)
@@ -57,11 +50,11 @@ func RemoveTCPPort(port int) error {
 	defer tcpListenerMutex.Unlock()
 	if listener, pres := tcpListeners[port]; pres {
 		delete(tcpListeners, port)
-		err := listener.socket.Close()
+		err := listener.Socket.Close()
 		if err != nil {
 			return err
 		}
-		for _, c := range listener.connections[port] {
+		for _, c := range listener.Connections[port] {
 			err := c.Close()
 			if err != nil {
 				return err
@@ -74,10 +67,10 @@ func RemoveTCPPort(port int) error {
 	}
 }
 
-func tcpListen(listener *TCPListener) error {
-	defer listener.socket.Close()
+func tcpListen(listener *model.TCPListener) error {
+	defer listener.Socket.Close()
 	for {
-		c, err := listener.socket.Accept()
+		c, err := listener.Socket.Accept()
 		if err != nil {
 			return err
 		}
@@ -86,7 +79,7 @@ func tcpListen(listener *TCPListener) error {
 }
 
 // Handles incoming requests.
-func handleTCPRequest(listener *TCPListener, c net.Conn) {
+func handleTCPRequest(listener *model.TCPListener, c net.Conn) {
 	port, err := portFromConn(c)
 	if err != nil {
 		log.Println("ERROR Capturing new HTTP connection:", err)
@@ -94,20 +87,20 @@ func handleTCPRequest(listener *TCPListener, c net.Conn) {
 	}
 
 	func() {
-		listener.mutex.Lock()
-		defer listener.mutex.Unlock()
-		listener.connections[port] = append(listener.connections[port], c)
+		listener.Mutex.Lock()
+		defer listener.Mutex.Unlock()
+		listener.Connections[port] = append(listener.Connections[port], c)
 	}()
 
 	defer func() {
-		listener.mutex.Lock()
-		listener.mutex.Unlock()
-		delete(listener.connections, port)
+		listener.Mutex.Lock()
+		listener.Mutex.Unlock()
+		delete(listener.Connections, port)
 	}()
 
-	//lbReq := &LBRequest{
+	//lbReq := &model.LBRequest{
 	//	Type:     "tcp",
-	//	Frontend: listener.frontend,
+	//	Frontend: listener.Frontend,
 	//}
 
 	//model.LoadBalance(lbReq)
