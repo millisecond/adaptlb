@@ -1,9 +1,9 @@
 package lb
 
 import (
+	"github.com/containous/traefik/log"
 	"github.com/millisecond/adaptlb/model"
 	"strconv"
-	"github.com/containous/traefik/log"
 )
 
 func healthcheck(frontend *model.Frontend) {

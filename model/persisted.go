@@ -1,52 +1,58 @@
 package model
 
 import (
-	"time"
 	"sync"
+	"time"
 )
 
 type LBType string
+
 const (
 	LBTypeHTTP LBType = "http"
-	LBTypeTCP LBType = "tcp"
-	LBTypeUDP LBType = "udp"
+	LBTypeTCP  LBType = "tcp"
+	LBTypeUDP  LBType = "udp"
 )
 
 type LBStrategy string
+
 const (
-	LBStrategyRandom LBStrategy = "random"
+	LBStrategyRandom     LBStrategy = "random"
 	LBStrategyRoundRobin LBStrategy = "round_robin"
 )
 
 type LBStickySessionType string
+
 const (
-	LBStickySessionTypeCookie LBStickySessionType = "cookie"
-	LBStickySessionTypeSrcIP LBStickySessionType = "src_ip"
-	LBStickySessionTypeDstIP LBStickySessionType = "dst_ip"
-	LBStickySessionTypeSrcPort LBStickySessionType = "src_port"
-	LBStickySessionTypeDstPort LBStickySessionType = "dst_port"
+	LBStickySessionTypeCookie    LBStickySessionType = "cookie"
+	LBStickySessionTypeSrcIP     LBStickySessionType = "src_ip"
+	LBStickySessionTypeDstIP     LBStickySessionType = "dst_ip"
+	LBStickySessionTypeSrcPort   LBStickySessionType = "src_port"
+	LBStickySessionTypeDstPort   LBStickySessionType = "dst_port"
 	LBStickySessionTypeSrcIPPort LBStickySessionType = "src_ipport"
 	LBStickySessionTypeDstIPPort LBStickySessionType = "dst_ipport"
 )
 
 type LBBackendType string
+
 const (
 	LBBackendTypeIndividual LBBackendType = "individual"
-	LBBackendTypeASG LBBackendType = "asg"
-	LBBackendTypeTG LBBackendType = "tg"
+	LBBackendTypeASG        LBBackendType = "asg"
+	LBBackendTypeTG         LBBackendType = "tg"
 )
 
 type LBHealthcheckType string
+
 const (
 	LBHealthcheckTypeHTTP LBHealthcheckType = "http"
-	LBHealthcheckTypeTCP LBHealthcheckType = "tcp"
+	LBHealthcheckTypeTCP  LBHealthcheckType = "tcp"
 	LBHealthcheckTypeICMP LBHealthcheckType = "icmp"
 )
 
 type DNSType string
+
 const (
-	DNSTypeA DNSType = "A"
-	DNSTypeAAAA DNSType = "AAAA"
+	DNSTypeA     DNSType = "A"
+	DNSTypeAAAA  DNSType = "AAAA"
 	DNSTypeBothA DNSType = "BOTHA"
 )
 
@@ -80,7 +86,7 @@ type ServerPool struct {
 	Backends []Backend `json:"backends,omitempty"` // Can be multiple to facilitate IP Lists and blue/green deploys
 	//CircuitBreaker *CircuitBreaker    `json:"circuitBreaker,omitempty"`
 
-	Strategy      LBStrategy `json:"strategy,omitempty"`      // "random", "roundrobin" - picks servers, sticky will override
+	Strategy          LBStrategy          `json:"strategy,omitempty"`          // "random", "roundrobin" - picks servers, sticky will override
 	StickySessionType LBStickySessionType `json:"stickySessionType,omitempty"` // "cookie", "src_ip", "src_port", "dst_ip", "dst_port"
 
 	// HTTP/TCP-only
@@ -99,9 +105,9 @@ type ServerPool struct {
 	FlushInterval         time.Duration `json:"flushInterval,omitempty"`
 
 	// In-memory state, don't persist
-	LiveServers []*LiveServer  `json:"-"`
+	LiveServers     []*LiveServer  `json:"-"`
 	LiveServerMutex *sync.RWMutex  `json:"-"`
-	SharedLBState *SharedLBState `json:"-"`
+	SharedLBState   *SharedLBState `json:"-"`
 }
 
 // DoS prevention: if one of these conditions is triggered for a node, it's no longer available as a target.
@@ -114,10 +120,10 @@ type ServerPool struct {
 type Backend struct {
 	RowID string `json:"rowId,omitempty"`
 
-	Type    LBBackendType `json:"type,omitempty"` // "individual", "asg", "targetgroup", "tagged"
-	Address string `json:"address,omitempty"`   // ip/hostname, ASG-name, targetgroup name, tag
-	Port    int    `json:"port"`           // port to use when connecting, invalid for "targetgroup"
-	Weight  int    `json:"weight"`         // portion of traffic to send
+	Type    LBBackendType `json:"type,omitempty"`    // "individual", "asg", "targetgroup", "tagged"
+	Address string        `json:"address,omitempty"` // ip/hostname, ASG-name, targetgroup name, tag
+	Port    int           `json:"port"`              // port to use when connecting, invalid for "targetgroup"
+	Weight  int           `json:"weight"`            // portion of traffic to send
 
 	Connections *[]*LiveConnection
 }
@@ -132,10 +138,10 @@ type HealthCheck struct {
 	HTTPSuccessCodes            []int  `json:"httpSuccessCodes,omitempty"`
 	HTTPSuccessResponseContains string `json:"httpSuccessResponseContains,omitempty"`
 
-	IntervalSeconds           int `json:"intervalSeconds,omitempty"`
-	Timeout            int    `json:"timeout,omitempty"`
-	HealthyThreshold   int    `json:"healthyThreshold,omitempty"`
-	UnhealthyThreshold int    `json:"unhealthyThreshold,omitempty"`
+	IntervalSeconds    int `json:"intervalSeconds,omitempty"`
+	Timeout            int `json:"timeout,omitempty"`
+	HealthyThreshold   int `json:"healthyThreshold,omitempty"`
+	UnhealthyThreshold int `json:"unhealthyThreshold,omitempty"`
 }
 
 type DNSRecords struct {

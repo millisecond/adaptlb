@@ -1,8 +1,8 @@
 package lb
 
 import (
-	"github.com/millisecond/adaptlb/model"
 	"github.com/docker/docker/pkg/random"
+	"github.com/millisecond/adaptlb/model"
 )
 
 // Sets LiveServer and other state on req
@@ -22,12 +22,12 @@ func LoadBalanceL4(req *model.LBRequest) bool {
 	}
 	switch req.ServerPool.Strategy {
 	case model.LBStrategyRoundRobin:
-		req.LiveServer = req.ServerPool.LiveServers[int(req.ServerPool.SharedLBState.IncrAndGetRequests() %serverCount)]
+		req.LiveServer = req.ServerPool.LiveServers[int(req.ServerPool.SharedLBState.IncrAndGetRequests()%serverCount)]
 	case model.LBStrategyRandom:
 		fallthrough
 	default:
 		// Random, doesn't need to be cryptographically defensible, just spread out
-		req.LiveServer = req.ServerPool.LiveServers[int(random.Rand.Uint64() % serverCount)]
+		req.LiveServer = req.ServerPool.LiveServers[int(random.Rand.Uint64()%serverCount)]
 	}
 	req.ServerPool.LiveServerMutex.RUnlock()
 	return true

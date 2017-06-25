@@ -11,11 +11,11 @@ import (
 // Container for all state associated with an inbound request
 type LBRequest struct {
 	// Inbound reqs should assign these fields and then call LoadBalance()
-	Type string // "http", "tcp", or"udp"
-	Frontend    *Frontend
+	Type     string // "http", "tcp", or"udp"
+	Frontend *Frontend
 
 	// The target of the load balancing
-	ServerPool  *ServerPool
+	ServerPool *ServerPool
 	LiveServer *LiveServer
 
 	// If http-type

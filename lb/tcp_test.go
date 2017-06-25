@@ -18,7 +18,7 @@ func TestTCPActivation(t *testing.T) {
 			RowID:       "abc",
 			Type:        "tcp",
 			ServerPools: []*model.ServerPool{},
-			Ports: port,
+			Ports:       port,
 		}},
 	}
 
@@ -62,10 +62,10 @@ func TestTCPSingleBackend(t *testing.T) {
 	testutil.TestTCPServer(t, backPort, []byte("RESP"))
 	cfg := &config.Config{
 		Frontends: []*model.Frontend{{
-			Type:        "tcp",
+			Type: "tcp",
 			ServerPools: []*model.ServerPool{
 				{Backends: []model.Backend{
-					{Type: "individual", Address:"localhost", Port: backPort},
+					{Type: "individual", Address: "localhost", Port: backPort},
 				}},
 			},
 			Ports: frontPort,
@@ -85,4 +85,3 @@ func TestTCPSingleBackend(t *testing.T) {
 	ensure.Nil(t, err)
 	ensure.DeepEqual(t, resp, expect)
 }
-
