@@ -19,6 +19,7 @@ func Activate(cfg *config.Config) error {
 
 	if activeConfig == nil {
 		for _, frontend := range cfg.Frontends {
+			frontend.Listeners = &map[int]*model.Listener{}
 			err := addListener(frontend)
 			if err != nil {
 				return err
@@ -30,15 +31,16 @@ func Activate(cfg *config.Config) error {
 
 	// we have an existing config, need to de-dupe
 	removedFrontEnds := []*model.Frontend{}
-	addedFrontends := activeConfig.Frontends
+	addedFrontends := []*model.Frontend{}
 
 	// Update matches and collect FE's to remove
 	for _, existing := range activeConfig.Frontends {
 		found := false
 		for _, toAdd := range cfg.Frontends {
 			if toAdd.RowID == existing.RowID {
-				//toAdd.Listeners = existing.Listeners
+				toAdd.Listeners = existing.Listeners
 				found = true
+				break
 			}
 		}
 		if !found {
@@ -52,8 +54,9 @@ func Activate(cfg *config.Config) error {
 		for _, existing := range activeConfig.Frontends {
 			if toAdd.RowID == existing.RowID {
 				// TODO changed ports
-				//toAdd.Listeners = existing.Listeners
+				toAdd.Listeners = existing.Listeners
 				found = true
+				break
 			}
 		}
 		if !found {
@@ -62,16 +65,17 @@ func Activate(cfg *config.Config) error {
 	}
 
 	// Stop old ones
-	//for _, fe := range removedFrontEnds {
-	//	for _, listener := range *fe.Listeners {
-	//		(*listener).Stop()
-	//	}
-	//}
+	for _, fe := range removedFrontEnds {
+		for _, listener := range *fe.Listeners {
+			(*listener).Stop()
+		}
+	}
 
 	// Start listening on new ones
-	//for _, fe := range addedFrontends {
-	//	addListener(fe)
-	//}
+	for _, fe := range addedFrontends {
+		fe.Listeners = &map[int]*model.Listener{}
+		addListener(fe)
+	}
 
 	activeConfig.Frontends = cfg.Frontends
 
@@ -82,7 +86,7 @@ func addListener(frontend *model.Frontend) error {
 	switch frontend.Type {
 	case "http":
 	case "tcp":
-		err := AddTCPPort(frontend)
+		err := addTCPPort(frontend)
 		if err != nil {
 			return err
 		}

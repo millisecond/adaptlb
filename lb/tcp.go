@@ -1,7 +1,6 @@
 package lb
 
 import (
-	"errors"
 	"fmt"
 	"github.com/millisecond/adaptlb/model"
 	"log"
@@ -11,10 +10,8 @@ import (
 )
 
 var tcpListenerMutex = &sync.Mutex{}
-var tcpListeners = map[int]*model.TCPListener{}
 
-
-func AddTCPPort(frontend *model.Frontend) error {
+func addTCPPort(frontend *model.Frontend) error {
 	tcpListenerMutex.Lock()
 	defer tcpListenerMutex.Unlock()
 	ports, err := parsePorts(frontend.Ports)
@@ -23,51 +20,47 @@ func AddTCPPort(frontend *model.Frontend) error {
 	}
 	for _, port := range ports {
 		listen := ":" + strconv.Itoa(port)
-		if _, pres := tcpListeners[port]; pres {
-			//if existing
-			return errors.New("Already listening on TCP " + listen)
-		}
 		log.Println("Opening LB TCP port", listen)
 		socket, err := net.Listen("tcp", listen)
 		if err != nil {
 			return err
 		}
-		tcpListener := &model.TCPListener{
+		listener := &model.Listener{
 			Port:        port,
 			Mutex:       &sync.Mutex{},
 			Socket:      socket,
 			Frontend:    frontend,
 			Connections: map[int][]net.Conn{},
 		}
-		tcpListeners[port] = tcpListener
-		go tcpListen(tcpListener)
+		(*frontend.Listeners)[port] = listener
+		go tcpListen(listener)
 	}
 	return nil
 }
+//
+//func RemoveTCPPort(port int) error {
+//	tcpListenerMutex.Lock()
+//	defer tcpListenerMutex.Unlock()
+//	if listener, pres := tcpListeners[port]; pres {
+//		delete(tcpListeners, port)
+//		err := listener.Socket.Close()
+//		if err != nil {
+//			return err
+//		}
+//		for _, c := range listener.Connections[port] {
+//			err := c.Close()
+//			if err != nil {
+//				return err
+//			}
+//		}
+//		return nil
+//	} else {
+//		listen := ":" + strconv.Itoa(port)
+//		return errors.New("Already listening on HTTP " + listen)
+//	}
+//}
 
-func RemoveTCPPort(port int) error {
-	tcpListenerMutex.Lock()
-	defer tcpListenerMutex.Unlock()
-	if listener, pres := tcpListeners[port]; pres {
-		delete(tcpListeners, port)
-		err := listener.Socket.Close()
-		if err != nil {
-			return err
-		}
-		for _, c := range listener.Connections[port] {
-			err := c.Close()
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	} else {
-		listen := ":" + strconv.Itoa(port)
-		return errors.New("Already listening on HTTP " + listen)
-	}
-}
-
-func tcpListen(listener *model.TCPListener) error {
+func tcpListen(listener *model.Listener) error {
 	defer listener.Socket.Close()
 	for {
 		c, err := listener.Socket.Accept()
@@ -79,7 +72,7 @@ func tcpListen(listener *model.TCPListener) error {
 }
 
 // Handles incoming requests.
-func handleTCPRequest(listener *model.TCPListener, c net.Conn) {
+func handleTCPRequest(listener *model.Listener, c net.Conn) {
 	port, err := portFromConn(c)
 	if err != nil {
 		log.Println("ERROR Capturing new HTTP connection:", err)

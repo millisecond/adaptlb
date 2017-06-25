@@ -24,7 +24,7 @@ type Frontend struct {
 	DNSRecords     DNSRecords `json:"dnsRecords,omitempty"` // Type of upstream DNS provider to update ("route53") or "" to disable updates
 	ShutdownWaitMS int        `json:"shutdownWaitMS,omitempty"`
 
-	Listeners *[]*Listener `json:"-"`
+	Listeners *map[int]*Listener `json:"-"`
 }
 
 type ServerPool struct {
@@ -35,6 +35,9 @@ type ServerPool struct {
 
 	Strategy      string `json:"strategy,omitempty"`      // "random", "roundrobin" - picks servers, sticky will override
 	StickySession string `json:"stickySession,omitempty"` // "cookie", "src_ip", "src_port", "dst_ip", "dst_port"
+
+	// HTTP/TCP-only
+	TLSBackend bool `json:"tlsBackend,omitempty"` // what version of proto to use on back-side
 
 	// HTTP-only
 	Path string `json:"route,omitempty"` // "" == default, "/admin", "/checkout"
@@ -50,7 +53,7 @@ type ServerPool struct {
 
 	// In-memory state, don't persist
 	LiveServers []*LiveServer `json:"-"`
-	SharedState *SharedState  `json:"-"`
+	SharedState *SharedLBState  `json:"-"`
 }
 
 // DoS prevention: if one of these conditions is triggered for a node, it's no longer available as a target.
@@ -67,6 +70,8 @@ type Backend struct {
 	ID     string `json:"id,omitempty"`   // ip/hostname, ASG-name, targetgroup name, tag
 	Port   int    `json:"port"`           // port to use when connecting, invalid for "targetgroup"
 	Weight int    `json:"weight"`         // portion of traffic to send
+
+	Connections *[]*LiveConnection
 }
 
 type HealthCheck struct {
