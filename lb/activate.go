@@ -11,9 +11,8 @@ import (
 )
 
 var activationMutex = &sync.Mutex{}
-var activeConfig *config.Config
 
-func Activate(cfg *config.Config) error {
+func Activate(activeConfig *config.Config, cfg *config.Config) error {
 	activationMutex.Lock()
 	defer activationMutex.Unlock()
 

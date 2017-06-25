@@ -3,6 +3,8 @@ package testutil
 import (
 	"math/rand"
 	"time"
+	"sync/atomic"
+	"strconv"
 )
 
 // From https://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang
@@ -32,4 +34,15 @@ func RandomString(n int) string {
 	}
 
 	return string(b)
+}
+
+// High-numbered unique port allocation for tests
+var atomicPort uint32 = 20000
+
+func UniquePort() int {
+	return int(atomic.AddUint32(&atomicPort, 1))
+}
+
+func UniquePortString() string {
+	return strconv.Itoa(UniquePort())
 }

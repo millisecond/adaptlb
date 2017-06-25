@@ -7,6 +7,7 @@ import (
 type Config struct {
 	Frontends []*model.Frontend
 	AWSConfig AWSConfig
+	DashboardConfig DashboardConfig
 }
 
 type AWSConfig struct {
@@ -15,4 +16,8 @@ type AWSConfig struct {
 	DynamoTableName string
 	Key             string
 	Secret          string
+}
+
+type DashboardConfig struct {
+	Port 	int
 }

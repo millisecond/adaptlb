@@ -10,7 +10,9 @@ import (
 )
 
 func TestTCPActivation(t *testing.T) {
-	port := "7001"
+	t.Parallel()
+
+	port := testutil.UniquePortString()
 	frontend := &model.Frontend{
 		RowID: "abc",
 		Type:        "tcp",
@@ -22,7 +24,7 @@ func TestTCPActivation(t *testing.T) {
 		Frontends: []*model.Frontend{frontend},
 	}
 
-	err := Activate(cfg)
+	err := Activate(nil, cfg)
 	ensure.Nil(t, err)
 
 	send := []byte("YO")
@@ -36,7 +38,7 @@ func TestTCPActivation(t *testing.T) {
 	ensure.DeepEqual(t, resp, expect)
 
 	// re-activate, make sure it's a no-op
-	err = Activate(cfg)
+	err = Activate(cfg, cfg)
 	ensure.Nil(t, err)
 
 	resp, err = testutil.SendTCP(servAddr, send)
@@ -44,7 +46,7 @@ func TestTCPActivation(t *testing.T) {
 	ensure.DeepEqual(t, resp, expect)
 
 	// Close and make sure no more conns are accepted
-	err = Activate(&config.Config{})
+	err = Activate(cfg, &config.Config{})
 	ensure.Nil(t, err)
 
 	// socket operations aren't immediate
