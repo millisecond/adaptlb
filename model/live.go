@@ -20,7 +20,7 @@ type LBRequest struct {
 
 	// If http-type
 	ResponseWriter http.ResponseWriter
-	HTTPRequest   *http.Request
+	HTTPRequest    *http.Request
 }
 
 type Listener struct {

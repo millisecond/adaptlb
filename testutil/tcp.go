@@ -3,6 +3,7 @@ package testutil
 import (
 	"fmt"
 	"github.com/facebookgo/ensure"
+	"github.com/millisecond/adaptlb/model"
 	"log"
 	"net"
 	"strconv"
@@ -34,6 +35,16 @@ func TestTCPServer(t *testing.T, port int, response []byte) net.Listener {
 		}
 	}()
 	return l
+}
+
+func TCPMiniCluster(t *testing.T, responses [][]byte) []model.Backend {
+	backends := []model.Backend{}
+	for _, response := range responses {
+		port := UniquePort()
+		TestTCPServer(t, port, response)
+		backends = append(backends, model.Backend{Type: "individual", Address: "localhost", Port: port})
+	}
+	return backends
 }
 
 func SendTCP(servAddr string, send []byte) ([]byte, error) {

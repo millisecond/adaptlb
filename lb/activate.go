@@ -97,6 +97,9 @@ func initConfig(cfg *config.Config) {
 		frontend.Listeners = &map[int]*model.Listener{}
 		for _, pool := range frontend.ServerPools {
 			pool.LiveServerMutex = &sync.RWMutex{}
+			pool.SharedLBState = &model.SharedLBState{
+				Requests: 0,
+			}
 		}
 	}
 }
