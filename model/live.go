@@ -1,10 +1,10 @@
 package model
 
 import (
+	"log"
+	"net"
 	"net/http"
 	"sync"
-	"net"
-	"log"
 )
 
 // Container for all state associated with an inbound request
@@ -23,7 +23,7 @@ type LBRequest struct {
 }
 
 type Listener struct {
-	Secure bool
+	Secure      bool
 	Port        int
 	Mutex       *sync.Mutex
 	Socket      net.Listener
@@ -67,5 +67,5 @@ type LiveServer struct {
 }
 
 type LiveConnection struct {
-	Conn 	net.Conn
+	Conn net.Conn
 }

@@ -52,8 +52,8 @@ type ServerPool struct {
 	FlushInterval         time.Duration `json:"flushInterval,omitempty"`
 
 	// In-memory state, don't persist
-	LiveServers []*LiveServer `json:"-"`
-	SharedState *SharedLBState  `json:"-"`
+	LiveServers []*LiveServer  `json:"-"`
+	SharedState *SharedLBState `json:"-"`
 }
 
 // DoS prevention: if one of these conditions is triggered for a node, it's no longer available as a target.

@@ -14,7 +14,7 @@ func TestTCPActivation(t *testing.T) {
 
 	port := testutil.UniquePortString()
 	frontend := &model.Frontend{
-		RowID: "abc",
+		RowID:       "abc",
 		Type:        "tcp",
 		ServerPools: []*model.ServerPool{},
 		Ports:       port,

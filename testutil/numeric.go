@@ -2,9 +2,9 @@ package testutil
 
 import (
 	"math/rand"
-	"time"
-	"sync/atomic"
 	"strconv"
+	"sync/atomic"
+	"time"
 )
 
 // From https://stackoverflow.com/questions/22892120/how-to-generate-a-random-string-of-a-fixed-length-in-golang

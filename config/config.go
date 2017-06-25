@@ -5,8 +5,8 @@ import (
 )
 
 type Config struct {
-	Frontends []*model.Frontend
-	AWSConfig AWSConfig
+	Frontends       []*model.Frontend
+	AWSConfig       AWSConfig
 	DashboardConfig DashboardConfig
 }
 
@@ -19,5 +19,5 @@ type AWSConfig struct {
 }
 
 type DashboardConfig struct {
-	Port 	int
+	Port int
 }
