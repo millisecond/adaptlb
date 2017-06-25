@@ -19,7 +19,7 @@ type LBRequest struct {
 	LiveServer *LiveServer
 
 	// If http-type
-	RespontWriter http.ResponseWriter
+	ResponseWriter http.ResponseWriter
 	HTTPRequest   *http.Request
 }
 
