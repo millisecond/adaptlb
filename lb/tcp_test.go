@@ -13,15 +13,13 @@ func TestTCPActivation(t *testing.T) {
 	t.Parallel()
 
 	port := testutil.UniquePortString()
-	frontend := &model.Frontend{
-		RowID:       "abc",
-		Type:        "tcp",
-		ServerPools: []*model.ServerPool{},
-		Ports:       port,
-	}
-
 	cfg := &config.Config{
-		Frontends: []*model.Frontend{frontend},
+		Frontends: []*model.Frontend{{
+			RowID:       "abc",
+			Type:        "tcp",
+			ServerPools: []*model.ServerPool{},
+			Ports: port,
+		}},
 	}
 
 	err := Activate(nil, cfg)
@@ -55,3 +53,36 @@ func TestTCPActivation(t *testing.T) {
 	_, err = testutil.SendTCP(servAddr, send)
 	ensure.NotNil(t, err)
 }
+
+func TestTCPSingleBackend(t *testing.T) {
+	t.Parallel()
+
+	frontPort := testutil.UniquePortString()
+	backPort := testutil.UniquePort()
+	testutil.TestTCPServer(t, backPort, []byte("RESP"))
+	cfg := &config.Config{
+		Frontends: []*model.Frontend{{
+			Type:        "tcp",
+			ServerPools: []*model.ServerPool{
+				{Backends: []model.Backend{
+					{Type: "individual", Address:"localhost", Port: backPort},
+				}},
+			},
+			Ports: frontPort,
+		}},
+	}
+
+	err := Activate(nil, cfg)
+	ensure.Nil(t, err)
+
+	send := []byte("YO")
+	expect := []byte("RESP")
+
+	servAddr := "localhost:" + frontPort
+	ensure.Nil(t, err)
+
+	resp, err := testutil.SendTCP(servAddr, send)
+	ensure.Nil(t, err)
+	ensure.DeepEqual(t, resp, expect)
+}
+

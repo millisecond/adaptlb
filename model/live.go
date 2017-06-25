@@ -5,16 +5,17 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"sync/atomic"
 )
 
 // Container for all state associated with an inbound request
 type LBRequest struct {
+	// Inbound reqs should assign these fields and then call LoadBalance()
 	Type string // "http", "tcp", or"udp"
-
 	Frontend    *Frontend
-	SharedState *SharedLBState
 
 	// The target of the load balancing
+	ServerPool  *ServerPool
 	LiveServer *LiveServer
 
 	// If http-type
@@ -33,7 +34,6 @@ type Listener struct {
 	//Stop()
 	//StopIfNot(*Frontend)
 	//Connections()[]*LiveConnection
-
 }
 
 func (listener *Listener) Stop() {
@@ -56,9 +56,13 @@ type SharedLBState struct {
 	Requests uint64
 }
 
+func (ss *SharedLBState) IncrAndGetRequests() uint64 {
+	return atomic.AddUint64(&ss.Requests, 1)
+}
+
 // In-memory structure that combines Backend and the results of Healthcheck
 type LiveServer struct {
-	Server *Backend
+	Address string // computed ip:port value
 
 	// Healthcheck state
 	Healthy             bool

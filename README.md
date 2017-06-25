@@ -1,16 +1,19 @@
 
 ##### Current version: UNRELEASED / FIRST VERSION IN DEV
 
+Cloud-native auto-scaling load balancer with built-in DNS zone updates.
 
-AWS-native auto-scaling load balancer with Route53 zone updates.
-
-Fast, modern, and easy to deploy load balancer (HTTP(S) / TCP / UDP) for deploying applications on AWS.
-
-* Gossip cluster allows dynamic scaling, shared state, and fast failover of load-balancer or target nodes.
-
+Gossip cluster powers:
+* Dynamic scaling 
+* Shared state
+* Fast fail-over of load-balancer or target nodes.
 * Automatically updates Route53 to point A records to LB public IPs
 
-* Valid load balancing targets include List of IPs, Target Groups, and Tagged Instances.
+Load Balancer Targets:
+* List of IPs/Hostnames
+* Auto-scaling groups
+* Target Groups
+* Tagged Instances.
 
 AdaptLB is developed and maintained by [Casey Haakenson](https://twitter.com/millisecond).
 

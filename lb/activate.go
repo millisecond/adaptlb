@@ -13,12 +13,14 @@ import (
 var activationMutex = &sync.Mutex{}
 
 func Activate(activeConfig *config.Config, cfg *config.Config) error {
+
 	activationMutex.Lock()
 	defer activationMutex.Unlock()
 
+	initConfig(cfg)
+
 	if activeConfig == nil {
 		for _, frontend := range cfg.Frontends {
-			frontend.Listeners = &map[int]*model.Listener{}
 			err := addListener(frontend)
 			if err != nil {
 				return err
@@ -49,6 +51,14 @@ func Activate(activeConfig *config.Config, cfg *config.Config) error {
 
 	// Find new FE's
 	for _, toAdd := range cfg.Frontends {
+		if toAdd.Type != "http" {
+			if len(toAdd.ServerPools) > 1 {
+				return errors.New("Cannot have multiple server pools for non-HTTP frontends.")
+			} else if len(toAdd.ServerPools) == 0 {
+				return errors.New("Must have a server pool to send traffic to.")
+			}
+		}
+
 		found := false
 		for _, existing := range activeConfig.Frontends {
 			if toAdd.RowID == existing.RowID {
@@ -81,7 +91,19 @@ func Activate(activeConfig *config.Config, cfg *config.Config) error {
 	return nil
 }
 
+// Initialize some temp structures through the config tree
+func initConfig(cfg *config.Config) {
+	for _, frontend := range cfg.Frontends {
+		frontend.Listeners = &map[int]*model.Listener{}
+		for _, pool := range frontend.ServerPools {
+			pool.LiveServerMutex = &sync.RWMutex{}
+		}
+	}
+}
+
 func addListener(frontend *model.Frontend) error {
+	go healthcheck(frontend)
+
 	switch frontend.Type {
 	case "http":
 	case "tcp":
@@ -91,7 +113,7 @@ func addListener(frontend *model.Frontend) error {
 		}
 	case "udp":
 	default:
-		return errors.New("Unknown config type: " + frontend.Type)
+		return errors.New("Unknown config type: " + string(frontend.Type))
 	}
 	return nil
 }

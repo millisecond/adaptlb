@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestTCPServer(t *testing.T, port int) net.Listener {
+func TestTCPServer(t *testing.T, port int, response []byte) net.Listener {
 	l, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	ensure.Nil(t, err)
 	go func() {
@@ -27,7 +27,7 @@ func TestTCPServer(t *testing.T, port int) net.Listener {
 					fmt.Println("Error reading:", err.Error())
 				}
 				// Send a response back to person contacting us.
-				c.Write([]byte("OK"))
+				c.Write(response)
 				// Close the connection when you're done with it.
 				c.Close()
 			}(c)
