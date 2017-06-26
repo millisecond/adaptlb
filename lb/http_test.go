@@ -10,9 +10,11 @@ import (
 )
 
 func TestHTTPListener(t *testing.T) {
-	frontend := &model.Frontend{Ports: "8000"}
+	t.Parallel()
 
-	port := 8000
+	port := testutil.UniquePort()
+	frontend := &model.Frontend{Ports: strconv.Itoa(port)}
+
 	err := AddHTTPPort(frontend)
 	ensure.Nil(t, err)
 

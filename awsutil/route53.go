@@ -21,7 +21,7 @@ func ListZones(ctx context.Context, cfg *config.Config) (*route53.ListHostedZone
 func CreateZone(ctx context.Context, cfg *config.Config, zoneName string) (*route53.CreateHostedZoneOutput, error) {
 	return Route53Client(ctx, cfg).CreateHostedZone(&route53.CreateHostedZoneInput{
 		CallerReference:  aws.String(zoneName + "create"),
-		HostedZoneConfig: &route53.HostedZoneConfig{Comment: aws.String("LineSpeedLB Managed Zone")},
+		HostedZoneConfig: &route53.HostedZoneConfig{Comment: aws.String("AdaptLB Managed Zone")},
 		Name:             aws.String(zoneName),
 	})
 }
@@ -55,7 +55,7 @@ func UpdateZone(ctx context.Context, cfg *config.Config, zoneID string, recordSe
 	return Route53Client(ctx, cfg).ChangeResourceRecordSets(&route53.ChangeResourceRecordSetsInput{
 		HostedZoneId: aws.String(zoneID),
 		ChangeBatch: &route53.ChangeBatch{
-			Comment: aws.String("LineSpeedLB Update"),
+			Comment: aws.String("AdaptLB Update"),
 			Changes: []*route53.Change{
 				{
 					Action: aws.String("UPSERT"),

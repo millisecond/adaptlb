@@ -9,8 +9,8 @@ import (
 	"strconv"
 )
 
-const DEFAULT_TABLE_NAME = "LineSpeedLB"
-const TESTING_TABLE_NAME = "LineSpeedLBTesting"
+const DEFAULT_TABLE_NAME = "AdaptLB"
+const TESTING_TABLE_NAME = "AdaptLBTesting"
 
 const HASH_KEY = "h"
 const RANGE_KEY = "r"

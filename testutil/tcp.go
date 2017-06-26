@@ -72,3 +72,13 @@ func SendTCP(servAddr string, send []byte) ([]byte, error) {
 	conn.Close()
 	return reply[:n], nil
 }
+
+func ValidateConsistentResponses(t *testing.T, servAddr string, send []byte) {
+	want, err := SendTCP(servAddr, send)
+	ensure.Nil(t, err)
+	for i := 0; i < 100; i++ {
+		got, err := SendTCP(servAddr, send)
+		ensure.Nil(t, err)
+		ensure.DeepEqual(t, want, got)
+	}
+}

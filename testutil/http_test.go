@@ -3,12 +3,16 @@ package testutil
 import (
 	"github.com/facebookgo/ensure"
 	"net/http"
+	"strconv"
 	"testing"
 )
 
 func TestStoppableHTTPListener(t *testing.T) {
-	srv := TestHTTPServer(8001)
-	url := "http://localhost:8001"
+	t.Parallel()
+
+	port := UniquePort()
+	srv := TestHTTPServer(port)
+	url := "http://localhost:" + strconv.Itoa(port)
 
 	resp, err := http.Get(url)
 	ensure.Nil(t, err)

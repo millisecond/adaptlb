@@ -10,6 +10,8 @@ import (
 )
 
 func TestBasicCluster(t *testing.T) {
+	t.Parallel()
+
 	// Start three nodes
 	nodes := []string{"127.0.0.1:7900", "127.0.0.1:7901", "127.0.0.1:7902"}
 

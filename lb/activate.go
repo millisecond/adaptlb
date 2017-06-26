@@ -1,21 +1,23 @@
 package lb
 
 import (
+	"context"
 	"errors"
 	"github.com/millisecond/adaptlb/config"
 	"github.com/millisecond/adaptlb/model"
+	"github.com/millisecond/adaptlb/util"
 	"net"
 	"strconv"
 	"strings"
-	"sync"
 )
 
-var activationMutex = &sync.Mutex{}
+var activationMutex = &util.WrappedMutex{}
 
 func Activate(activeConfig *config.Config, cfg *config.Config) error {
+	ctx := context.Background()
 
-	activationMutex.Lock()
-	defer activationMutex.Unlock()
+	activationMutex.Lock(ctx)
+	defer activationMutex.Unlock(ctx)
 
 	initConfig(cfg)
 
@@ -82,7 +84,6 @@ func Activate(activeConfig *config.Config, cfg *config.Config) error {
 
 	// Start listening on new ones
 	for _, fe := range addedFrontends {
-		fe.Listeners = &map[int]*model.Listener{}
 		addListener(fe)
 	}
 
@@ -96,7 +97,7 @@ func initConfig(cfg *config.Config) {
 	for _, frontend := range cfg.Frontends {
 		frontend.Listeners = &map[int]*model.Listener{}
 		for _, pool := range frontend.ServerPools {
-			pool.LiveServerMutex = &sync.RWMutex{}
+			pool.LiveServerMutex = &util.WrappedRWMutex{}
 			pool.SharedLBState = &model.SharedLBState{
 				Requests: 0,
 			}

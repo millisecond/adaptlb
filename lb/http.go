@@ -1,20 +1,21 @@
 package lb
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/millisecond/adaptlb/model"
+	"github.com/millisecond/adaptlb/util"
 	"log"
 	"net"
 	"net/http"
 	"strconv"
-	"sync"
 )
 
-var httpListenerMutex = &sync.Mutex{}
+var httpListenerMutex = &util.WrappedMutex{}
 var httpListeners = map[int]net.Listener{}
 var httpListenerConnections = map[int][]net.Conn{}
-var httpListenerMutexes = map[int]*sync.Mutex{}
+var httpListenerMutexes = map[int]*util.WrappedMutex{}
 
 // HTTP Listeners are a single http.Server listening on multiple connections.
 var HTTPServer = &http.Server{
@@ -34,8 +35,9 @@ func connState(c net.Conn, state http.ConnState) {
 			log.Println("ERROR Capturing new connection:", err)
 			return
 		}
-		httpListenerMutexes[port].Lock()
-		defer httpListenerMutexes[port].Unlock()
+		ctx := context.Background()
+		httpListenerMutexes[port].Lock(ctx)
+		defer httpListenerMutexes[port].Unlock(ctx)
 		if state == http.StateNew {
 			httpListenerConnections[port] = append(httpListenerConnections[port], c)
 		} else if state == http.StateClosed {
@@ -45,8 +47,9 @@ func connState(c net.Conn, state http.ConnState) {
 }
 
 func AddHTTPPort(frontend *model.Frontend) error {
-	httpListenerMutex.Lock()
-	defer httpListenerMutex.Unlock()
+	ctx := context.Background()
+	httpListenerMutex.Lock(ctx)
+	defer httpListenerMutex.Unlock(ctx)
 	ports, err := parsePorts(frontend.Ports)
 	if err != nil {
 		return err
@@ -62,15 +65,16 @@ func AddHTTPPort(frontend *model.Frontend) error {
 			return err
 		}
 		httpListeners[port] = l
-		httpListenerMutexes[port] = &sync.Mutex{}
+		httpListenerMutexes[port] = &util.WrappedMutex{}
 		go HTTPServer.Serve(l)
 	}
 	return nil
 }
 
 func RemoveHTTPPort(port int) error {
-	httpListenerMutex.Lock()
-	defer httpListenerMutex.Unlock()
+	ctx := context.Background()
+	httpListenerMutex.Lock(ctx)
+	defer httpListenerMutex.Unlock(ctx)
 	if listener, pres := httpListeners[port]; pres {
 		delete(httpListeners, port)
 		err := listener.Close()

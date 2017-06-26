@@ -1,20 +1,20 @@
 package lb
 
 import (
+	"context"
 	"github.com/millisecond/adaptlb/model"
+	"github.com/millisecond/adaptlb/util"
 	"log"
 	"net"
 	"strconv"
-	"sync"
-	"sync/atomic"
-	"time"
 )
 
-var tcpListenerMutex = &sync.Mutex{}
+var tcpListenerMutex = &util.WrappedMutex{}
 
 func addTCPPort(frontend *model.Frontend) error {
-	tcpListenerMutex.Lock()
-	defer tcpListenerMutex.Unlock()
+	ctx := context.Background()
+	tcpListenerMutex.Lock(ctx)
+	defer tcpListenerMutex.Unlock(ctx)
 	ports, err := parsePorts(frontend.Ports)
 	if err != nil {
 		return err
@@ -28,7 +28,7 @@ func addTCPPort(frontend *model.Frontend) error {
 		}
 		listener := &model.Listener{
 			Port:        port,
-			Mutex:       &sync.Mutex{},
+			Mutex:       &util.WrappedMutex{},
 			Socket:      socket,
 			Frontend:    frontend,
 			Connections: map[int][]net.Conn{},
@@ -58,16 +58,17 @@ func handleTCPRequest(listener *model.Listener, inboundConn net.Conn) {
 		return
 	}
 
+	ctx := context.Background()
 	func() {
-		listener.Mutex.Lock()
-		defer listener.Mutex.Unlock()
+		listener.Mutex.Lock(ctx)
 		listener.Connections[port] = append(listener.Connections[port], inboundConn)
+		listener.Mutex.Unlock(ctx)
 	}()
 
 	defer func() {
-		listener.Mutex.Lock()
-		listener.Mutex.Unlock()
+		listener.Mutex.Lock(ctx)
 		delete(listener.Connections, port)
+		listener.Mutex.Unlock(ctx)
 	}()
 
 	lbReq := &model.LBRequest{
@@ -82,30 +83,13 @@ func handleTCPRequest(listener *model.Listener, inboundConn net.Conn) {
 		return
 	}
 
-	// pipeDone counts closed pipe
-	var pipeDone int32
-	var timer *time.Timer
-
 	backendConn, err := net.Dial("tcp", lbReq.LiveServer.Address)
 
 	// write to dst what it reads from src
-	var pipe = func(src, dst net.Conn) {
+	var cp = func(src, dst net.Conn) {
 		defer func() {
-			// if it is the first pipe to end...
-			if v := atomic.AddInt32(&pipeDone, 1); v == 1 {
-				// ...wait 'timeout' seconds before closing connections
-				timer = time.AfterFunc(time.Second, func() {
-					// test if the other pipe is still alive before closing conn
-					if atomic.AddInt32(&pipeDone, 1) == 2 {
-						inboundConn.Close()
-						backendConn.Close()
-					}
-				})
-			} else if v == 2 {
-				inboundConn.Close()
-				backendConn.Close()
-				timer.Stop()
-			}
+			inboundConn.Close()
+			backendConn.Close()
 		}()
 
 		buff := make([]byte, 65535)
@@ -121,6 +105,6 @@ func handleTCPRequest(listener *model.Listener, inboundConn net.Conn) {
 			}
 		}
 	}
-	go pipe(inboundConn, backendConn)
-	go pipe(backendConn, inboundConn)
+	go cp(inboundConn, backendConn)
+	go cp(backendConn, inboundConn)
 }

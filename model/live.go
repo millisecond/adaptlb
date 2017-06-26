@@ -1,10 +1,11 @@
 package model
 
 import (
+	"context"
+	"github.com/millisecond/adaptlb/util"
 	"log"
 	"net"
 	"net/http"
-	"sync"
 	"sync/atomic"
 )
 
@@ -26,7 +27,7 @@ type LBRequest struct {
 type Listener struct {
 	Secure      bool
 	Port        int
-	Mutex       *sync.Mutex
+	Mutex       *util.WrappedMutex
 	Socket      net.Listener
 	Frontend    *Frontend
 	Connections map[int][]net.Conn
@@ -41,6 +42,9 @@ func (listener *Listener) Stop() {
 	if err != nil {
 		log.Println(err)
 	}
+	ctx := context.Background()
+	listener.Mutex.Lock(ctx)
+	defer listener.Mutex.Unlock(ctx)
 	for _, conns := range listener.Connections {
 		for _, conn := range conns {
 			err := conn.Close()
