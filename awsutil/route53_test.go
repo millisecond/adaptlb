@@ -10,6 +10,10 @@ import (
 )
 
 func TestCreateListDeleteZone(t *testing.T) {
+	if testing.Short() {
+		return
+	}
+
 	cfg := localRoute53Config()
 
 	name := testutil.RandomString(10) + ".com."
@@ -21,6 +25,10 @@ func TestCreateListDeleteZone(t *testing.T) {
 }
 
 func TestModifyZone(t *testing.T) {
+	if testing.Short() {
+		return
+	}
+
 	cfg := localRoute53Config()
 
 	zoneName := testutil.RandomString(10) + ".com."

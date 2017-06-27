@@ -11,6 +11,10 @@ import (
 func TestDyanmoVersioning(t *testing.T) {
 	t.Parallel()
 
+	if testing.Short() {
+		return
+	}
+
 	cfg := localDynamoDBConfig(t)
 
 	DeleteItem(context.Background(), cfg, DNSUpdateType, DNSUpdateRangeKey)

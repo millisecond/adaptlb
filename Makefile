@@ -36,6 +36,10 @@ testloop:
 testloopshort:
 	while $(GO) test -race -short -test.timeout 15s `go list ./... | grep -v '/vendor/'`; do :; done
 
+bench:
+	#for d in *; do (cd "$d" && echo "$d" && $(GO) test -bench=.); done
+	go test ./... -short -bench=.
+
 fmt:
 	gofmt -w `find . -type f -name '*.go' | grep -v vendor`
 
