@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestTCPServer(t *testing.T, port int, response []byte) net.Listener {
+func TestTCPServer(t ensure.Fataler, port int, response []byte) net.Listener {
 	l, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	ensure.Nil(t, err)
 	go func() {
@@ -37,7 +37,7 @@ func TestTCPServer(t *testing.T, port int, response []byte) net.Listener {
 	return l
 }
 
-func TCPMiniCluster(t *testing.T, responses [][]byte) []model.Backend {
+func TCPMiniCluster(t ensure.Fataler, responses [][]byte) []model.Backend {
 	backends := []model.Backend{}
 	for _, response := range responses {
 		port := UniquePort()
